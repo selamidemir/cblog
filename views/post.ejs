@@ -37,6 +37,11 @@
             >NASA on The Commons</a
           >.
         </p>
+        <div class="bg-light pt-1 pb-1 pl-5">
+          <a href="/posts/update/<%= post._id %>">UPDATE</a> | 
+          <a href="/posts/<%= post._id %>?_method=DELETE"
+            onclick="return confirm('Are you sure?')">DELETE</a>
+        </div>
       </div>
     </div>
   </div>

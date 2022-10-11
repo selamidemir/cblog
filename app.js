@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const methodOverride = require("method-override");
 
 const Post = require("./models/Post");
 
@@ -8,6 +9,11 @@ const app = express();
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
+app.use(
+  methodOverride("_method", {
+    methods: ["POST", "GET"],
+  })
+);
 
 mongoose
   .connect("mongodb://localhost:27017/cleanblog-db")
@@ -34,7 +40,7 @@ app.get("/add-post", (req, res) => {
   res.render("add_post");
 });
 
-app.post("/add-post", async (req, res) => {
+app.post("/posts", async (req, res) => {
   const data = {
     title: req.body.title,
     description: req.body.description,
@@ -42,6 +48,46 @@ app.post("/add-post", async (req, res) => {
   };
   await Post.create(data);
   res.redirect("/add-post");
+});
+
+app.delete("/posts/:id", async (req, res) => {
+  try {
+    await Post.findByIdAndRemove(req.params.id);
+    res.redirect("/");
+  } catch (err) {
+    res.json({
+      status: "fail",
+      error: err,
+    });
+  }
+});
+
+app.get("/posts/update/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    res.render("update_post", { post });
+  } catch (err) {
+    res.json({
+      status: "Fail",
+      err,
+    });
+  }
+});
+
+app.put("/posts", async (req, res) => {
+  try {
+    const post = await Post.findById(req.query.id);
+    post.title = req.body.title;
+    post.description = req.body.description;
+    post.save();
+
+    res.redirect(`/posts/${post.slug}`);
+  } catch (err) {
+    res.json({
+      status: "Fail",
+      err,
+    });
+  }
 });
 
 app.get("/posts/:slug", async (req, res) => {
