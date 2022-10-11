@@ -3,7 +3,7 @@ var slugify = require("slugify");
 
 const Schema = mongoose.Schema;
 
-const BlogSchema = Schema({
+const PostSchema = Schema({
   title: {
     type: String,
     required: true,
@@ -27,13 +27,13 @@ const BlogSchema = Schema({
   },
 });
 
-BlogSchema.pre("validate", function (next) {
-  this.slug = slugify(this.name, {
+PostSchema.pre("validate", function (next) {
+  this.slug = slugify(this.slug, {
     lower: true,
     strict: true,
   });
   next();
 });
 
-const Blog = mongoose.model("Blog", BlogSchema);
-module.exports = Blog;
+const Post = mongoose.model("Post", PostSchema);
+module.exports = Post;
